@@ -1,17 +1,37 @@
 package com.isanabanana.stickmanmmo
 
 import android.content.Context
+import android.media.MediaPlayer
 import com.isanabanana.aim.GameObject
 import com.isanabanana.aim.Scene
 import org.json.JSONObject
 
 class ArenaScene(private val appContext: Context) : Scene() {
     private var room: com.isanabanana.aim.RealtimeRoom? = null
+    private var music: MediaPlayer? = null
     private lateinit var arena: ArenaController
     private var networkStatus = "ROOM: OFFLINE"
 
     override fun onCreate() {
-        // Asset failures must not prevent the local training arena from starting.
+        // Start optional background music without making startup depend on its presence.
+        music = runCatching {
+            val afd = appContext.assets.openFd("nature.mp3")
+            MediaPlayer().apply {
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
+                isLooping = true
+                setVolume(0.55f, 0.55f)
+                setOnErrorListener { player, _, _ ->
+                    runCatching { player.release() }
+                    music = null
+                    true
+                }
+                prepare()
+                start()
+            }
+        }.getOrNull()
+
+        // Load each sprite independently; a damaged asset only falls back for that character.
         val atlas = runCatching { SpriteAtlas.load(appContext) }
             .getOrElse { SpriteAtlas.fallback() }
 
@@ -26,8 +46,7 @@ class ArenaScene(private val appContext: Context) : Scene() {
         )
         add(GameObject("ArenaController").apply { addComponent(arena) })
 
-        // Multiplayer is optional for this first local-play test. A bad endpoint
-        // or connection setup must never crash the game at launch.
+        // Multiplayer is optional; the local training arena must work offline.
         room = runCatching {
             joinRoom(
                 url = "wss://aim-room-server.bravewarrior011.workers.dev/game?room=training",
@@ -63,6 +82,9 @@ class ArenaScene(private val appContext: Context) : Scene() {
     override fun onDestroy() {
         runCatching { room?.leave() }
         room = null
+        runCatching { music?.stop() }
+        runCatching { music?.release() }
+        music = null
         super.onDestroy()
     }
 }
