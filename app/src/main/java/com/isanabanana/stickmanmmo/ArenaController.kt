@@ -94,8 +94,12 @@ class ArenaController(
                     mob.x += dx / distance * mob.speed * dt
                     mob.y += dy / distance * mob.speed * dt
                 } else if (invulnerable <= 0f) {
-                    hp -= (12f * dt).toInt().coerceAtLeast(if (dt > 0f) 1 else 0)
-                    hitFlash = 0.12f
+                    mob.attackTimer -= dt
+                    if (mob.attackTimer <= 0f) {
+                        hp = (hp - 8).coerceAtLeast(0)
+                        mob.attackTimer = 0.75f
+                        hitFlash = 0.12f
+                    }
                 }
             } else if (mob.respawn <= 0f) {
                 mob.respawn = 3f
@@ -249,6 +253,6 @@ class ArenaController(
 
     private data class Mob(
         var x: Float, var y: Float, val type: Int, var hp: Int, val speed: Float,
-        val maxHp: Int = hp, var flash: Float = 0f, var respawn: Float = 0f
+        val maxHp: Int = hp, var flash: Float = 0f, var respawn: Float = 0f, var attackTimer: Float = 0f
     )
 }
