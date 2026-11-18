@@ -19,21 +19,34 @@ class SpriteAtlas private constructor(
 ) {
     companion object {
         fun load(context: Context): SpriteAtlas {
-            fun read(name: String): Bitmap {
-                val encoded = context.assets.open("sprites/$name.png.b64").bufferedReader().use { it.readText() }
-                val bytes = Base64.decode(encoded, Base64.DEFAULT)
-                val bitmap = requireNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
-                    "Invalid sprite sheet: $name"
-                }
-                require(bitmap.width >= 96 && bitmap.height >= 128) {
-                    "Sprite sheet $name is ${bitmap.width}x${bitmap.height}; expected at least 96x128."
-                }
-                return bitmap
+            val safe = fallback()
+            fun read(name: String, fallbackBitmap: Bitmap): Bitmap {
+                return runCatching {
+                    val encoded = context.assets.open("sprites/$name.png.b64")
+                        .bufferedReader().use { it.readText() }
+                        .filterNot { it.isWhitespace() }
+                    val bytes = Base64.decode(encoded, Base64.DEFAULT)
+                    val options = BitmapFactory.Options().apply {
+                        inPreferredConfig = Bitmap.Config.ARGB_8888
+                    }
+                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+                        ?: error("PNG decode returned null for $name")
+                    require(bitmap.width >= 96 && bitmap.height >= 128) {
+                        "Sprite sheet $name is ${bitmap.width}x${bitmap.height}; expected at least 96x128."
+                    }
+                    bitmap
+                }.getOrElse { fallbackBitmap }
             }
-            return SpriteAtlas(read("player"), read("mob-fast"), read("mob-heavy"), read("mob-guard"))
+            // Load each character independently: one damaged file must not hide the other sprites.
+            return SpriteAtlas(
+                read("player", safe.player),
+                read("mob-fast", safe.fastMob),
+                read("mob-heavy", safe.heavyMob),
+                read("mob-guard", safe.guardMob)
+            )
         }
 
-        /** Safe visible fallback so a missing/corrupt image cannot terminate startup. */
+        /** Safe visible fallback for an individual missing/corrupt sprite. */
         fun fallback(): SpriteAtlas {
             fun make(color: Int): Bitmap {
                 val bitmap = Bitmap.createBitmap(96, 128, Bitmap.Config.ARGB_8888)
@@ -81,7 +94,6 @@ class SpriteAtlas private constructor(
         val width = 42f * scale
         val height = 48f * scale
         val dst = RectF(x - width / 2f, feetY - height, x + width / 2f, feetY)
-        val paint = Paint(Paint.FILTER_BITMAP_FLAG)
-        canvas.drawBitmap(bitmap, src, dst, paint)
+        canvas.drawBitmap(bitmap, src, dst, Paint(Paint.FILTER_BITMAP_FLAG))
     }
 }
