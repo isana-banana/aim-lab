@@ -16,7 +16,7 @@ A landscape Android 2D action prototype using **AIM v0.5** as a separate depende
 3. Under **Artifacts**, download `stickman-mmo-debug-apk`.
 4. Extract the ZIP and install `app-debug.apk` on the Android phone. Allow installation from that file source if Android asks.
 
-The workflow fetches `isana-banana/aim` at branch `aim-v0.5`, copies only its `aim-core` module into the build workspace, then builds the APK with Gradle. No Android Studio or PC is required on the phone.
+The repository contains a pinned AIM Core v0.5 source snapshot under `aim-core/` (see `AIM_CORE_VERSION.md`). GitHub Actions builds this project directly with Gradle. The original AIM repository is not modified. No Android Studio or PC is required on the phone.
 
 ## Multiplayer room
 - WebSocket URL: `wss://aim-room-server.bravewarrior011.workers.dev/game?room=training`
