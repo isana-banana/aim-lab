@@ -65,7 +65,9 @@ class UIButton(
     /** Called when the captured pointer ends; true means it ended inside the button. */
     var onRelease: ((releasedInside: Boolean) -> Unit)? = null,
     /** Draw and hit-test this button as a circle instead of a rounded rectangle. */
-    var circular: Boolean = false
+    var circular: Boolean = false,
+    /** Multiplies the alpha of the button background and label (0 = invisible, 1 = opaque). */
+    var opacity: Float = 1f
 ) : Component() {
     private val background = Paint(Paint.ANTI_ALIAS_FLAG)
     private val label = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -75,14 +77,17 @@ class UIButton(
     private var pressedPointerId: Int? = null
     private var pressed = false
 
-    init { require(width > 0f && height > 0f); require(cornerRadius >= 0f) }
+    init { require(width > 0f && height > 0f); require(cornerRadius >= 0f); require(opacity in 0f..1f) }
 
     override fun draw(canvas: Canvas) {
         background.color = if (!enabled) 0xFF5F6570.toInt() else if (pressed) pressedColor else backgroundColor
+        background.alpha = (Color.alpha(background.color) * opacity).toInt().coerceIn(0, 255)
         if (circular) canvas.drawCircle(0f, 0f, minOf(width, height) / 2f, background)
         else canvas.drawRoundRect(-width / 2f, -height / 2f, width / 2f, height / 2f,
             cornerRadius, cornerRadius, background)
-        label.color = textColor; label.textSize = textSize.coerceAtLeast(1f)
+        label.color = textColor
+        label.alpha = (Color.alpha(textColor) * opacity).toInt().coerceIn(0, 255)
+        label.textSize = textSize.coerceAtLeast(1f)
         val baseline = -((label.descent() + label.ascent()) / 2f)
         canvas.drawText(text, 0f, baseline, label)
     }
