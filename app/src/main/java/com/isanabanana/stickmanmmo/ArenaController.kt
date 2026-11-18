@@ -70,13 +70,13 @@ class ArenaController(
         hitFlash = max(0f, hitFlash - dt)
 
         px = (px + joystickX * 205f * dt).coerceIn(55f, 905f)
-        py = (py + joystickY * 170f * dt).coerceIn(165f, 465f)
+        py = (py + joystickY * 170f * dt).coerceIn(75f, 505f)
         if (abs(joystickX) > abs(joystickY) && abs(joystickX) > 0.08f) facing = if (joystickX > 0f) 1 else -1
         else if (abs(joystickY) > 0.08f) facing = if (joystickY > 0f) 0 else 2
 
         if (dodgeHeld && dodgeCooldown <= 0f) {
             px = (px + if (facing == -1) -70f else if (facing == 1) 70f else 0f).coerceIn(55f, 905f)
-            py = (py + if (facing == 0) 55f else if (facing == 2) -55f else 0f).coerceIn(165f, 465f)
+            py = (py + if (facing == 0) 55f else if (facing == 2) -55f else 0f).coerceIn(75f, 505f)
             dodgeCooldown = 0.65f
             invulnerable = 0.48f
             dodgeHeld = false
@@ -128,7 +128,7 @@ class ArenaController(
                 }
             }
             val distanceToPlayer = hypot(px - mob.x, py - mob.y)
-            if (distanceToPlayer < if (mob.kind == Kind.GUARD) 62f else 48f && invulnerable <= 0f) {
+            if (distanceToPlayer < (if (mob.kind == Kind.GUARD) 62f else 48f) && invulnerable <= 0f) {
                 mob.attackTimer -= dt
                 if (mob.attackTimer <= 0f) {
                     hp = (hp - mob.damage).coerceAtLeast(0)
@@ -174,11 +174,11 @@ class ArenaController(
                     updateStick(event.x, event.y)
                     return true
                 }
-                if (event.x > 800f && event.y > 360f) {
+                if (event.x > 800f && event.y > 365f) {
                     attackHeld = true
                     return true
                 }
-                if (event.x > 660f && event.y > 360f) {
+                if (event.x > 660f && event.x <= 800f && event.y > 365f) {
                     dodgeHeld = true
                     return true
                 }
@@ -205,7 +205,7 @@ class ArenaController(
 
     private fun updateStick(x: Float, y: Float) {
         val dx = x - 130f
-        val dy = y - 410f
+        val dy = y - 440f
         val length = hypot(dx, dy).coerceAtLeast(1f)
         joystickX = (dx / max(90f, length)).coerceIn(-1f, 1f)
         joystickY = (dy / max(90f, length)).coerceIn(-1f, 1f)
@@ -215,26 +215,23 @@ class ArenaController(
         canvas.drawColor(Color.rgb(250, 249, 245))
         ink.color = Color.rgb(225, 222, 214)
         ink.strokeWidth = 1.2f
-        for (x in 0..960 step 48) canvas.drawLine(x.toFloat(), 115f, x.toFloat(), 520f, ink)
-        for (y in 115..520 step 48) canvas.drawLine(24f, y.toFloat(), 936f, y.toFloat(), ink)
-        ink.color = Color.rgb(65, 65, 65)
-        ink.strokeWidth = 3f
-        canvas.drawRoundRect(24f, 112f, 936f, 520f, 18f, 18f, ink)
+        for (x in 0..960 step 48) canvas.drawLine(x.toFloat(), 0f, x.toFloat(), 540f, ink)
+        for (y in 0..540 step 48) canvas.drawLine(0f, y.toFloat(), 960f, y.toFloat(), ink)
 
         text.color = Color.rgb(40, 40, 40)
         text.textSize = 22f
-        canvas.drawText("PAPER ARENA  /  TRAINING ROOM", 34f, 42f, text)
+        canvas.drawText("PAPER ARENA  /  TRAINING ROOM", 24f, 28f, text)
         text.textSize = 15f
-        canvas.drawText(networkLabel, 35f, 72f, text)
-        canvas.drawText("SCORE  $score", 820f, 42f, text)
+        canvas.drawText(networkLabel, 24f, 52f, text)
+        canvas.drawText("SCORE  $score", 820f, 28f, text)
 
         fill.color = Color.rgb(220, 220, 220)
-        canvas.drawRoundRect(34f, 84f, 234f, 98f, 7f, 7f, fill)
+        canvas.drawRoundRect(24f, 64f, 224f, 78f, 7f, 7f, fill)
         fill.color = if (hp > 30) Color.rgb(50, 50, 50) else Color.rgb(150, 55, 55)
-        canvas.drawRoundRect(34f, 84f, 34f + 2f * hp, 98f, 7f, 7f, fill)
+        canvas.drawRoundRect(24f, 64f, 24f + 2f * hp, 78f, 7f, 7f, fill)
         text.textSize = 13f
         text.color = Color.DKGRAY
-        canvas.drawText("HP $hp / 100", 245f, 96f, text)
+        canvas.drawText("HP $hp / 100", 234f, 77f, text)
 
         mobs.forEach { mob ->
             if (mob.hp > 0) {
@@ -261,18 +258,18 @@ class ArenaController(
         sprites.draw(canvas, sprites.player, px, py, facing, animationFrame, 1.38f)
 
         fill.color = Color.argb(55, 30, 30, 30)
-        canvas.drawCircle(130f, 410f, 66f, fill)
+        canvas.drawCircle(130f, 440f, 66f, fill)
         ink.color = Color.rgb(75, 75, 75)
         ink.strokeWidth = 3f
-        canvas.drawCircle(130f, 410f, 66f, ink)
+        canvas.drawCircle(130f, 440f, 66f, ink)
         fill.color = Color.argb(100, 70, 70, 70)
-        canvas.drawCircle(130f + joystickX * 35f, 410f + joystickY * 35f, 25f, fill)
-        drawControl(canvas, 735f, 438f, 47f, "DODGE")
-        drawControl(canvas, 860f, 438f, 57f, "ATTACK")
+        canvas.drawCircle(130f + joystickX * 35f, 440f + joystickY * 35f, 25f, fill)
+        drawControl(canvas, 735f, 445f, 47f, "DODGE")
+        drawControl(canvas, 860f, 445f, 57f, "ATTACK")
         text.color = Color.GRAY
         text.textSize = 12f
-        canvas.drawText("MOVE", 107f, 500f, text)
-        canvas.drawText("MC / FAST / HEAVY / GUARD", 365f, 505f, text)
+        canvas.drawText("MOVE", 107f, 525f, text)
+        canvas.drawText("MC / FAST / HEAVY / GUARD", 365f, 525f, text)
     }
 
     private fun drawShadow(canvas: Canvas, x: Float, y: Float) {
