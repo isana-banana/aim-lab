@@ -220,15 +220,6 @@ class ArenaController(
         }
         drawShadow(canvas, px, py)
 
-        fill.color = Color.argb(55, 30, 30, 30)
-        canvas.drawCircle(130f, 440f, 66f, fill)
-        ink.color = Color.rgb(75, 75, 75)
-        ink.strokeWidth = 3f
-        canvas.drawCircle(130f, 440f, 66f, ink)
-        fill.color = Color.argb(100, 70, 70, 70)
-        canvas.drawCircle(130f + joystickX * 35f, 440f + joystickY * 35f, 25f, fill)
-        drawControl(canvas, 735f, 445f, 47f, "DODGE")
-        drawControl(canvas, 860f, 445f, 57f, "ATTACK")
         text.color = Color.GRAY
         text.textSize = 12f
         canvas.drawText("MOVE", 107f, 525f, text)
@@ -238,17 +229,6 @@ class ArenaController(
     private fun drawShadow(canvas: Canvas, x: Float, y: Float) {
         fill.color = Color.argb(35, 0, 0, 0)
         canvas.drawOval(x - 18f, y - 5f, x + 18f, y + 3f, fill)
-    }
-
-    private fun drawControl(canvas: Canvas, x: Float, y: Float, radius: Float, label: String) {
-        fill.color = Color.argb(35, 20, 20, 20)
-        canvas.drawCircle(x, y, radius, fill)
-        ink.color = Color.rgb(55, 55, 55)
-        ink.strokeWidth = 3f
-        canvas.drawCircle(x, y, radius, ink)
-        text.color = Color.rgb(40, 40, 40)
-        text.textSize = 13f
-        canvas.drawText(label, x, y + radius + 19f, text)
     }
 
     private enum class Kind { FAST, HEAVY, GUARD }
