@@ -1,16 +1,18 @@
 package com.isanabanana.stickmanmmo
 
+import android.content.Context
 import com.isanabanana.aim.GameObject
 import com.isanabanana.aim.Scene
 import org.json.JSONObject
 
-class ArenaScene : Scene() {
+class ArenaScene(private val appContext: Context) : Scene() {
     private var room: com.isanabanana.aim.RealtimeRoom? = null
     private lateinit var arena: ArenaController
     private var networkStatus = "CONNECTING"
 
     override fun onCreate() {
         arena = ArenaController(
+            sprites = SpriteAtlas.load(appContext),
             sendState = { x, y, facing, hp ->
                 val payload = JSONObject()
                     .put("x", x).put("y", y)
@@ -19,7 +21,6 @@ class ArenaScene : Scene() {
             }
         )
         add(GameObject("ArenaController").apply { addComponent(arena) })
-
         room = joinRoom(
             url = "wss://aim-room-server.bravewarrior011.workers.dev/game?room=training",
             roomId = "training",
@@ -44,9 +45,7 @@ class ArenaScene : Scene() {
         )
     }
 
-    override fun onUpdate(delta: Float) {
-        arena.networkLabel = networkStatus
-    }
+    override fun onUpdate(delta: Float) { arena.networkLabel = networkStatus }
 
     override fun onDestroy() {
         room?.leave()
