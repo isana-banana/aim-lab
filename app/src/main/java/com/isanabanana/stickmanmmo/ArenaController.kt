@@ -4,13 +4,11 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import com.isanabanana.aim.Component
-import com.isanabanana.aim.GameTouchEvent
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 
 class ArenaController(
-    private val sprites: SpriteAtlas,
     private val sendState: (Float, Float, Int, Int) -> Unit
 ) : Component() {
     private val ink = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -55,6 +53,25 @@ class ArenaController(
         Mob(610f, 420f, Kind.GUARD, 260, 0f, 22)
     )
     var networkLabel = "ROOM: CONNECTING"
+
+    val playerX: Float get() = px
+    val playerY: Float get() = py
+    val playerFacing: Int get() = facing
+    val playerFrame: Int get() = animationFrame
+
+    data class MobView(val x: Float, val y: Float, val direction: Int, val frame: Int, val alive: Boolean)
+    val fastView: MobView get() = mobs.first { it.kind == Kind.FAST }.view()
+    val heavyView: MobView get() = mobs.first { it.kind == Kind.HEAVY }.view()
+    val guardView: MobView get() = mobs.first { it.kind == Kind.GUARD }.view()
+
+    private fun Mob.view() = MobView(x, y, direction, if (flash > 0f) 0 else animationFrame, hp > 0)
+
+    fun setMovement(x: Float, y: Float) {
+        joystickX = x.coerceIn(-1f, 1f)
+        joystickY = y.coerceIn(-1f, 1f)
+    }
+    fun tapAttack() { attackHeld = true }
+    fun requestDodge() { dodgeHeld = true }
 
     fun updateRemote(x: Float, y: Float, direction: Int, remoteHp: Int) {
         remoteX = x.coerceIn(80f, 880f)
@@ -166,51 +183,6 @@ class ArenaController(
     private fun directionTo(dx: Float, dy: Float): Int =
         if (abs(dx) > abs(dy)) if (dx >= 0f) 1 else -1 else if (dy >= 0f) 0 else 2
 
-    override fun onTouch(event: GameTouchEvent): Boolean {
-        when (event.action) {
-            GameTouchEvent.Action.DOWN -> {
-                if (event.x < 280f && joystickPointer == -1) {
-                    joystickPointer = event.pointerId
-                    updateStick(event.x, event.y)
-                    return true
-                }
-                if (event.x > 800f && event.y > 365f) {
-                    attackHeld = true
-                    return true
-                }
-                if (event.x > 660f && event.x <= 800f && event.y > 365f) {
-                    dodgeHeld = true
-                    return true
-                }
-            }
-            GameTouchEvent.Action.MOVE -> if (event.pointerId == joystickPointer) {
-                updateStick(event.x, event.y)
-                return true
-            }
-            GameTouchEvent.Action.UP, GameTouchEvent.Action.CANCEL -> {
-                if (event.pointerId == joystickPointer) {
-                    joystickPointer = -1
-                    joystickX = 0f
-                    joystickY = 0f
-                    return true
-                }
-                if (event.x > 660f) {
-                    attackHeld = false
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    private fun updateStick(x: Float, y: Float) {
-        val dx = x - 130f
-        val dy = y - 440f
-        val length = hypot(dx, dy).coerceAtLeast(1f)
-        joystickX = (dx / max(90f, length)).coerceIn(-1f, 1f)
-        joystickY = (dy / max(90f, length)).coerceIn(-1f, 1f)
-    }
-
     override fun draw(canvas: Canvas) {
         canvas.drawColor(Color.rgb(250, 249, 245))
         ink.color = Color.rgb(225, 222, 214)
@@ -236,13 +208,6 @@ class ArenaController(
         mobs.forEach { mob ->
             if (mob.hp > 0) {
                 drawShadow(canvas, mob.x, mob.y)
-                val bitmap = when (mob.kind) {
-                    Kind.FAST -> sprites.fastMob
-                    Kind.HEAVY -> sprites.heavyMob
-                    Kind.GUARD -> sprites.guardMob
-                }
-                val frame = ((System.currentTimeMillis() / 170L) % 3L).toInt()
-                sprites.draw(canvas, bitmap, mob.x, mob.y, mob.direction, frame, if (mob.kind == Kind.GUARD) 1.42f else 1.18f)
                 fill.color = Color.LTGRAY
                 canvas.drawRect(mob.x - 25f, mob.y - 62f, mob.x + 25f, mob.y - 57f, fill)
                 fill.color = if (mob.flash > 0f) Color.RED else Color.DKGRAY
@@ -252,10 +217,8 @@ class ArenaController(
 
         remoteX?.let { x ->
             drawShadow(canvas, x, remoteY)
-            sprites.draw(canvas, sprites.player, x, remoteY, remoteFacing, 1, 1.22f)
         }
         drawShadow(canvas, px, py)
-        sprites.draw(canvas, sprites.player, px, py, facing, animationFrame, 1.38f)
 
         fill.color = Color.argb(55, 30, 30, 30)
         canvas.drawCircle(130f, 440f, 66f, fill)
