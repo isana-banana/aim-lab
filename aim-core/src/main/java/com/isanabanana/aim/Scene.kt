@@ -219,12 +219,15 @@ open class Scene : GameScene() {
         y: Float,
         width: Float = 180f,
         height: Float = 52f,
+        color: Int = Color.rgb(67, 126, 220),
+        alpha: Float = 1f,
         onClick: () -> Unit
     ): Button {
+        require(alpha in 0f..1f)
         val obj = GameObject("Button:$value")
         obj.transform.x = x
         obj.transform.y = y
-        val control = UIButton(width, height, value, onClick = onClick)
+        val control = UIButton(width, height, value, backgroundColor = color, onClick = onClick, opacity = alpha)
         obj.addComponent(control)
         add(obj)
         return Button(obj, control)
@@ -241,8 +244,8 @@ open class Scene : GameScene() {
         val obj = GameObject("CircleButton:$value", screenSpace = true)
         obj.transform.x = x
         obj.transform.y = y
-        val control = UIButton(size, size, value, textSize = 14f, cornerRadius = size / 2f,
-            onClick = onClick, circular = true)
+        val control = UIButton(size, size, value, textSize = 14f, backgroundColor = color,
+            cornerRadius = size / 2f, onClick = onClick, circular = true, opacity = alpha)
         obj.addComponent(control)
         add(obj)
         return Button(obj, control)
