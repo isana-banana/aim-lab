@@ -1,0 +1,47 @@
+name: Build Stickman MMO
+
+on:
+  push:
+    branches: [main, "prototype/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Stickman MMO
+        uses: actions/checkout@v4
+        with:
+          path: game
+      - name: Checkout AIM v0.5
+        uses: actions/checkout@v4
+        with:
+          repository: isana-banana/aim
+          ref: aim-v0.5
+          path: aim-source
+      - name: Attach AIM Core source without modifying AIM repository
+        run: cp -R aim-source/aim-core game/aim-core
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+      - name: Build debug APK
+        working-directory: game
+        run: gradle --no-daemon :app:assembleDebug
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickman-mmo-debug-apk
+          path: game/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
