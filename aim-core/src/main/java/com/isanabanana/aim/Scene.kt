@@ -212,6 +212,23 @@ open class Scene : GameScene() {
         return Label(obj, renderer)
     }
 
+    /** Backward-compatible button overload for existing positional onClick calls. */
+    protected fun button(
+        value: String,
+        x: Float,
+        y: Float,
+        width: Float = 180f,
+        height: Float = 52f,
+        onClick: () -> Unit
+    ): Button = button(
+        value = value,
+        x = x,
+        y = y,
+        width = width,
+        height = height,
+        onClick = onClick
+    )
+
     /** Create a tappable button centered at x/y. */
     protected fun button(
         value: String,
