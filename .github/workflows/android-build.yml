@@ -18,14 +18,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: game
-      - name: Checkout AIM v0.5
-        uses: actions/checkout@v4
-        with:
-          repository: isana-banana/aim
-          ref: aim-v0.5
-          path: aim-source
-      - name: Attach AIM Core source without modifying AIM repository
-        run: cp -R aim-source/aim-core game/aim-core
+      - name: Use vendored AIM Core v0.5 source
+        run: test -f game/aim-core/src/main/java/com/isanabanana/aim/Game.kt
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
