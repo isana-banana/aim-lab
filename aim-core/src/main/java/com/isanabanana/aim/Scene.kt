@@ -239,8 +239,11 @@ open class Scene : GameScene() {
         x: Float,
         y: Float,
         size: Float = 88f,
+        color: Int = Color.rgb(67, 126, 220),
+        alpha: Float = 1f,
         onClick: () -> Unit
     ): Button {
+        require(alpha in 0f..1f)
         val obj = GameObject("CircleButton:$value", screenSpace = true)
         obj.transform.x = x
         obj.transform.y = y
