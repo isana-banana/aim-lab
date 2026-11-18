@@ -50,10 +50,10 @@ class ArenaScene : Scene() {
         joystick(x = 130f, y = 440f, radius = 66f) { x, y ->
             arena.setMovement(x, y)
         }
-        button("DODGE", x = 735f, y = 445f, width = 104f, height = 94f) {
+        circleButton("DODGE", x = 735f, y = 445f, size = 88f) {
             arena.requestDodge()
         }
-        button("ATTACK", x = 860f, y = 445f, width = 118f, height = 108f) {
+        circleButton("ATTACK", x = 860f, y = 445f, size = 100f) {
             arena.tapAttack()
         }
 
