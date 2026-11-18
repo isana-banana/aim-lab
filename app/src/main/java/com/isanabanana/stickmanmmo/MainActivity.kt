@@ -34,5 +34,5 @@ class MainActivity : Game() {
         if (hasFocus) enterImmersiveMode()
     }
 
-    override fun createScene(): GameScene = ArenaScene(applicationContext)
+    override fun createScene(): GameScene = ArenaScene()
 }
