@@ -230,6 +230,24 @@ open class Scene : GameScene() {
         return Button(obj, control)
     }
 
+    /** Create a round touch button centered at x/y. */
+    protected fun circleButton(
+        value: String,
+        x: Float,
+        y: Float,
+        size: Float = 88f,
+        onClick: () -> Unit
+    ): Button {
+        val obj = GameObject("CircleButton:$value", screenSpace = true)
+        obj.transform.x = x
+        obj.transform.y = y
+        val control = UIButton(size, size, value, textSize = 14f, cornerRadius = size / 2f,
+            onClick = onClick, circular = true)
+        obj.addComponent(control)
+        add(obj)
+        return Button(obj, control)
+    }
+
     /** Create a button that repeats its action while the player holds a finger on it. */
     protected fun touchButton(
         value: String,
