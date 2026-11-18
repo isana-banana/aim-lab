@@ -63,7 +63,9 @@ class UIButton(
     /** Called as soon as a pointer presses the button. */
     var onPress: (() -> Unit)? = null,
     /** Called when the captured pointer ends; true means it ended inside the button. */
-    var onRelease: ((releasedInside: Boolean) -> Unit)? = null
+    var onRelease: ((releasedInside: Boolean) -> Unit)? = null,
+    /** Draw and hit-test this button as a circle instead of a rounded rectangle. */
+    var circular: Boolean = false
 ) : Component() {
     private val background = Paint(Paint.ANTI_ALIAS_FLAG)
     private val label = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -77,7 +79,8 @@ class UIButton(
 
     override fun draw(canvas: Canvas) {
         background.color = if (!enabled) 0xFF5F6570.toInt() else if (pressed) pressedColor else backgroundColor
-        canvas.drawRoundRect(-width / 2f, -height / 2f, width / 2f, height / 2f,
+        if (circular) canvas.drawCircle(0f, 0f, minOf(width, height) / 2f, background)
+        else canvas.drawRoundRect(-width / 2f, -height / 2f, width / 2f, height / 2f,
             cornerRadius, cornerRadius, background)
         label.color = textColor; label.textSize = textSize.coerceAtLeast(1f)
         val baseline = -((label.descent() + label.ascent()) / 2f)
@@ -136,6 +139,10 @@ class UIButton(
         val c = cos(radians).toFloat(); val s = sin(radians).toFloat()
         val localX = (dx * c + dy * s) / transform.scaleX
         val localY = (-dx * s + dy * c) / transform.scaleY
+        if (circular) {
+            val radius = minOf(width, height) / 2f
+            return localX * localX + localY * localY <= radius * radius
+        }
         return localX >= -width / 2f && localX <= width / 2f &&
             localY >= -height / 2f && localY <= height / 2f
     }
