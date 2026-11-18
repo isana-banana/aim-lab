@@ -147,6 +147,53 @@ open class Scene : GameScene() {
         return Sprite(obj, renderer)
     }
 
+    /**
+     * Load a directional sprite sheet from res/drawable.
+     * Example: spriteSheet("hero", 32, 32, columns = 3, rows = 4, x = 180f, y = 260f)
+     */
+    protected fun spriteSheet(
+        resourceName: String,
+        frameWidth: Int,
+        frameHeight: Int,
+        columns: Int,
+        rows: Int,
+        x: Float = 0f,
+        y: Float = 0f,
+        width: Float = frameWidth.toFloat(),
+        height: Float = frameHeight.toFloat()
+    ): AnimatedSprite {
+        require(frameWidth > 0 && frameHeight > 0 && columns > 0 && rows > 0)
+        val ctx = checkNotNull(context) { "Scene must be launched by an AIM Game." }
+        val id = ctx.resources.getIdentifier(resourceName, "drawable", ctx.packageName)
+        require(id != 0) { "Sprite sheet '$resourceName' was not found in res/drawable." }
+        val bitmap = assets.loadBitmap(ctx, id)
+        val obj = GameObject("SpriteSheet:$resourceName")
+        obj.transform.x = x
+        obj.transform.y = y
+        val renderer = SpriteSheetRenderer(
+            bitmap, columns, rows, frameWidth.toFloat(), frameHeight.toFloat(), width, height
+        )
+        obj.addComponent(renderer)
+        add(obj)
+        return AnimatedSprite(obj, renderer)
+    }
+
+    /** Add a virtual analog joystick. onMove receives normalized horizontal/vertical values. */
+    protected fun joystick(
+        x: Float,
+        y: Float,
+        radius: Float = 58f,
+        onMove: (horizontal: Float, vertical: Float) -> Unit
+    ): VirtualJoystick {
+        val obj = GameObject("Joystick", screenSpace = true)
+        obj.transform.x = x
+        obj.transform.y = y
+        val control = VirtualJoystick(radius, onMove)
+        obj.addComponent(control)
+        add(obj)
+        return control
+    }
+
     /** Add a text label. Its position is the text baseline origin. */
     protected fun text(
         value: String,
