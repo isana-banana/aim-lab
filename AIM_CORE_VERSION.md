@@ -1,10 +1,10 @@
 # AIM single-file version
 
-AIM Lab uses the official generated single-file distribution from:
+AIM Lab uses the generated single-file distribution with adaptive EXPAND viewport from:
 
 - Repository: https://github.com/isana-banana/aim
-- Branch: `aim-v0.5`
-- Pinned source commit: `0410ade9404c950d93802c7dd3f7e055280086fd`
+- Branch: `feature/expand-viewport`
+- Pinned source commit: `10796d641ae22d187c6d2e653b0b9db6a3e13885`
 - Generator: `tools/build_single_file.py`
 - Generated output: `dist/AIM.kt`
 - App destination during CI: `app/src/main/java/com/isanabanana/aim/AIM.kt`
