@@ -3,9 +3,13 @@ package com.isanabanana.aimlab
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Color
 import android.util.DisplayMetrics
 import com.caverock.androidsvg.SVG
+import com.isanabanana.aim.Component
 import com.isanabanana.aim.Game
 import com.isanabanana.aim.GameObject
 import com.isanabanana.aim.GameScene
@@ -61,6 +65,24 @@ private class LabStartScene(
                     addComponent(SpriteRenderer(bitmap, backgroundWidth, backgroundHeight))
                 })
             }
+        }
+
+        // Animated mascot: the uploaded horizontal sheet contains eight equal poses.
+        try {
+            val mascotBitmap = activity.assets.open("mascot.png").use {
+                BitmapFactory.decodeStream(it)
+            }
+            if (mascotBitmap != null && mascotBitmap.width >= 8 && mascotBitmap.width % 8 == 0) {
+                add(GameObject("AppleMascot").apply {
+                    transform.x = visibleWorldWidth / 2f
+                    transform.y = visibleWorldHeight * 0.56f
+                    renderLayer = 50
+                    screenSpace = true
+                    addComponent(MascotAnimationRenderer(mascotBitmap, 8, 0.14f, 112f, 128f))
+                })
+            }
+        } catch (_: Exception) {
+            // Keep the game usable if the optional mascot asset is missing.
         }
 
         statusRenderer = TextRenderer("PILIH BUAH", 14f, Color.WHITE)
@@ -141,5 +163,37 @@ private class LabStartScene(
             GameTouchEvent.Action.MOVE -> if (pressedFruit != null) return true
         }
         return false
+    }
+}
+
+
+/** Draws and animates equal-width frames from a horizontal sprite sheet. */
+private class MascotAnimationRenderer(
+    private val bitmap: Bitmap,
+    private val frameCount: Int,
+    private val secondsPerFrame: Float,
+    private val drawWidth: Float,
+    private val drawHeight: Float
+) : Component() {
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val source = Rect()
+    private val destination = RectF()
+    private val frameWidth = bitmap.width / frameCount
+    private var elapsed = 0f
+    private var frame = 0
+
+    override fun update(deltaSeconds: Float) {
+        if (deltaSeconds <= 0f) return
+        elapsed += deltaSeconds.coerceAtMost(0.25f)
+        while (elapsed >= secondsPerFrame) {
+            elapsed -= secondsPerFrame
+            frame = (frame + 1) % frameCount
+        }
+    }
+
+    override fun draw(canvas: Canvas) {
+        source.set(frame * frameWidth, 0, (frame + 1) * frameWidth, bitmap.height)
+        destination.set(-drawWidth / 2f, -drawHeight / 2f, drawWidth / 2f, drawHeight / 2f)
+        canvas.drawBitmap(bitmap, source, destination, paint)
     }
 }
