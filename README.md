@@ -1,28 +1,44 @@
-# Stickman MMO
+# AIM Lab
 
-A landscape Android 2D action prototype using **AIM v0.5** as a separate dependency. The AIM repository is checked out by CI; this project does not modify AIM.
+A collection of small Android 2D game projects used to learn, exercise, and validate **AIM Engine**.
 
-## Playable prototype
+## Current project: Stickman Arena
+
+The first experiment is a landscape 2D action game:
 - Monochrome paper arena with a stickman hero, sword and shield.
-- Left virtual joystick.
-- Right-side Dodge and Attack controls.
-- Three enemy silhouettes with different health/speed profiles.
+- Left virtual joystick and right-side Dodge / Attack controls.
+- Three enemy types with different health and movement profiles.
 - Enemy pursuit, hit feedback, health, score, defeat and respawn loop.
 - Optional WebSocket room presence and remote-player state relay.
 
-## Build and install on Android
+## Engine baseline
+
+- Engine repository: https://github.com/isana-banana/aim
+- Target branch: `aim-v0.5`
+- Target commit: `0410ade9404c950d93802c7dd3f7e055280086fd`
+- The currently vendored `aim-core/` directory is an older snapshot. It must be synchronized and regression-tested against the target commit before this project is considered a verified AIM v0.5 game. See [AIM_CORE_VERSION.md](AIM_CORE_VERSION.md).
+
+The AIM repository is the engine source of truth. Do not develop engine changes in this repository; game-specific experiments belong here.
+
+## Build on Android
+
 1. Open **Actions** in this repository.
-2. Select **Build Stickman MMO** and open the latest successful run.
-3. Under **Artifacts**, download `stickman-mmo-debug-apk`.
-4. Extract the ZIP and install `app-debug.apk` on the Android phone. Allow installation from that file source if Android asks.
+2. Run the Android build workflow.
+3. Download the APK artifact from a successful run.
+4. Install the APK on an Android phone.
 
-The repository contains a pinned AIM Core v0.5 source snapshot under `aim-core/` (see `AIM_CORE_VERSION.md`). GitHub Actions builds this project directly with Gradle. The original AIM repository is not modified. No Android Studio or PC is required on the phone.
+GitHub Actions is used so development and APK builds can be managed from a phone without Android Studio or a PC.
 
-## Multiplayer room
+## Multiplayer experiment
+
 - WebSocket URL: `wss://aim-room-server.bravewarrior011.workers.dev/game?room=training`
 - Room ID: `training`
 
-The game sends periodic `state` room events. The connection status is shown at the top of the arena. A successful APK build does not prove that the remote Worker speaks the same room protocol; test with two devices to verify actual synchronization.
+The room server is currently a relay, not an authoritative combat server. Account identity, secure progression, matchmaking, persistence, anti-cheat, and reconnect reconciliation are not implemented.
 
-## Prototype limitations
-This is an early playable slice, not a production MMO. The room server is a relay, not an authoritative combat server; account identity, secure progression, matchmaking, persistence, anti-cheat, and reconnect reconciliation are not implemented. Background music is not bundled yet because the audio asset is not present in this repository.
+## Working rules
+
+- Keep the engine version explicit and reproducible.
+- Keep each game experiment isolated from the AIM engine repository.
+- Make small changes, build, and test before adding the next feature.
+- Do not call a game AIM v0.5-verified until its engine snapshot or dependency matches the pinned commit and the APK has been tested.
