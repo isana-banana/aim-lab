@@ -45,15 +45,31 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
-      - name: Build debug APK
+      - name: Build installable APK
         working-directory: game
-        run: gradle --no-daemon :app:assembleDebug
+        env:
+          AIMLAB_KEYSTORE_BASE64: ${{ secrets.AIMLAB_KEYSTORE_BASE64 }}
+          AIMLAB_STORE_PASSWORD: ${{ secrets.AIMLAB_STORE_PASSWORD }}
+          AIMLAB_KEY_PASSWORD: ${{ secrets.AIMLAB_KEY_PASSWORD }}
+          AIMLAB_KEY_ALIAS: ${{ secrets.AIMLAB_KEY_ALIAS }}
+        run: |
+          if [ -n "$AIMLAB_KEYSTORE_BASE64" ] && [ -n "$AIMLAB_STORE_PASSWORD" ] && [ -n "$AIMLAB_KEY_PASSWORD" ] && [ -n "$AIMLAB_KEY_ALIAS" ]; then
+            echo "$AIMLAB_KEYSTORE_BASE64" | base64 --decode > aimlab-release.p12
+            export AIMLAB_KEYSTORE_PATH="$PWD/aimlab-release.p12"
+            gradle --no-daemon clean :app:assembleRelease
+            cp app/build/outputs/apk/release/app-release.apk aim-lab-install.apk
+            echo "APK_MODE=signed-release" >> "$GITHUB_ENV"
+          else
+            gradle --no-daemon clean :app:assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk aim-lab-install.apk
+            echo "APK_MODE=debug-unsigned-custom" >> "$GITHUB_ENV"
+          fi
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: aim-lab-debug-apk
-          path: game/app/build/outputs/apk/debug/app-debug.apk
+          name: aim-lab-installable-apk
+          path: game/aim-lab-install.apk
           if-no-files-found: error
           retention-days: 14
 
