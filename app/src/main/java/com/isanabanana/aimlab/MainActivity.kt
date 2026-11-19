@@ -1,39 +1,52 @@
 package com.isanabanana.aimlab
 
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import com.isanabanana.aim.Game
 import com.isanabanana.aim.GameObject
 import com.isanabanana.aim.GameScene
+import com.isanabanana.aim.SpriteRenderer
 import com.isanabanana.aim.TextRenderer
 
 class MainActivity : Game() {
     override val gameWidth = 360f
     override val gameHeight = 640f
-    override val gameBackground = Color.rgb(18, 24, 36)
+    override val gameBackground = Color.rgb(35, 55, 42)
 
-    override fun createScene(): GameScene = LabStartScene()
+    override fun createScene(): GameScene = LabStartScene(this)
 }
 
-val background = sprite("orchard_bg")
-    .position(180f, 320f)
-    .size(360f, 640f)
-    
-private class LabStartScene : GameScene() {
+private class LabStartScene(
+    private val activity: MainActivity
+) : GameScene() {
+
     override fun onStart() {
+        // Load the background from app/src/main/res/drawable/orchard_bg.jpg.
+        // If the image has not been uploaded yet, keep the scene runnable.
+        val imageId = activity.resources.getIdentifier(
+            "orchard_bg",
+            "drawable",
+            activity.packageName
+        )
+
+        if (imageId != 0) {
+            val bitmap = BitmapFactory.decodeResource(activity.resources, imageId)
+            if (bitmap != null) {
+                add(GameObject("OrchardBackground").apply {
+                    transform.x = 180f
+                    transform.y = 320f
+                    renderLayer = -100
+                    addComponent(SpriteRenderer(bitmap, 360f, 640f))
+                })
+            }
+        }
+
+        // Temporary label: we will replace this with the first game object
+        // when the background is confirmed working.
         add(GameObject("LabTitle").apply {
             transform.x = 180f
-            transform.y = 260f
-            addComponent(TextRenderer("AIM LAB", 32f, Color.WHITE))
-        })
-        add(GameObject("LabSubtitle").apply {
-            transform.x = 180f
-            transform.y = 305f
-            addComponent(TextRenderer("TEMPAT LATIHAN GAME 2D", 13f, Color.rgb(170, 190, 220)))
-        })
-        add(GameObject("LabHint").apply {
-            transform.x = 180f
-            transform.y = 365f
-            addComponent(TextRenderer("Mulai dari tutorial pertamamu", 12f, Color.LTGRAY))
+            transform.y = 48f
+            addComponent(TextRenderer("AIM LAB", 22f, Color.WHITE))
         })
     }
 }
