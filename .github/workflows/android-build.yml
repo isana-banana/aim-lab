@@ -1,8 +1,8 @@
-name: Build Stickman MMO
+name: Build AIM Lab - Stickman
 
 on:
   push:
-    branches: [main, "prototype/**"]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -14,11 +14,11 @@ jobs:
   android:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Stickman MMO
+      - name: Checkout AIM Lab
         uses: actions/checkout@v4
         with:
           path: game
-      - name: Use vendored AIM Core v0.5 source
+      - name: Verify vendored AIM Core source
         run: test -f game/aim-core/src/main/java/com/isanabanana/aim/Game.kt
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -35,7 +35,7 @@ jobs:
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: stickman-mmo-debug-apk
+          name: aim-lab-stickman-debug-apk
           path: game/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
