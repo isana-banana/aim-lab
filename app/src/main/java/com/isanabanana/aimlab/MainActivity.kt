@@ -36,7 +36,11 @@ private class LabStartScene(
                     transform.x = 180f
                     transform.y = 320f
                     renderLayer = -100
-                    addComponent(SpriteRenderer(bitmap, 360f, 640f))
+
+                    // Preserve the image's original aspect ratio so the full
+                    // top and bottom remain visible without vertical cropping.
+                    val displayWidth = 640f * bitmap.width / bitmap.height
+                    addComponent(SpriteRenderer(bitmap, displayWidth, 640f))
                 })
             }
         }
