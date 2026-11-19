@@ -14,6 +14,10 @@ class MainActivity : Game() {
     override fun createScene(): GameScene = LabStartScene()
 }
 
+val background = sprite("orchard_bg")
+    .position(180f, 320f)
+    .size(360f, 640f)
+    
 private class LabStartScene : GameScene() {
     override fun onStart() {
         add(GameObject("LabTitle").apply {
