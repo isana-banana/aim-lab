@@ -31,3 +31,6 @@ The starter app only shows a simple AIM Lab welcome screen. It is intentionally 
 2. I explain the goal briefly and make the smallest code change.
 3. GitHub Actions builds the project.
 4. After the build succeeds, install and test it before we continue.
+
+
+Starter reset: clean AIM v0.5 single-file learning workspace.
