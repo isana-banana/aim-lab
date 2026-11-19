@@ -15,6 +15,29 @@ android {
         versionName = "0.1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            val storePath = System.getenv("AIMLAB_KEYSTORE_PATH")
+            val storePasswordValue = System.getenv("AIMLAB_STORE_PASSWORD")
+            val keyAliasValue = System.getenv("AIMLAB_KEY_ALIAS")
+            val keyPasswordValue = System.getenv("AIMLAB_KEY_PASSWORD")
+            if (!storePath.isNullOrBlank() && !storePasswordValue.isNullOrBlank() &&
+                !keyAliasValue.isNullOrBlank() && !keyPasswordValue.isNullOrBlank()) {
+                storeFile = file(storePath)
+                storePassword = storePasswordValue
+                keyAlias = keyAliasValue
+                keyPassword = keyPasswordValue
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
