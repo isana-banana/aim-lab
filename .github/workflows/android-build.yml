@@ -1,4 +1,4 @@
-name: Build AIM Lab - Stickman
+name: Build AIM Lab
 
 on:
   push:
@@ -18,24 +18,48 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: game
-      - name: Verify vendored AIM Core source
-        run: test -f game/aim-core/src/main/java/com/isanabanana/aim/Game.kt
+
+      - name: Checkout official AIM v0.5 source
+        uses: actions/checkout@v4
+        with:
+          repository: isana-banana/aim
+          ref: 0410ade9404c950d93802c7dd3f7e055280086fd
+          path: aim-source
+
+      - name: Generate official single-file AIM.kt
+        run: |
+          python3 aim-source/tools/build_single_file.py
+          mkdir -p game/app/src/main/java/com/isanabanana/aim
+          cp aim-source/dist/AIM.kt game/app/src/main/java/com/isanabanana/aim/AIM.kt
+          test -s game/app/src/main/java/com/isanabanana/aim/AIM.kt
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.11.1"
+
       - name: Build debug APK
         working-directory: game
         run: gradle --no-daemon :app:assembleDebug
+
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: aim-lab-stickman-debug-apk
+          name: aim-lab-debug-apk
           path: game/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload generated AIM v0.5 single file
+        uses: actions/upload-artifact@v4
+        with:
+          name: aim-lab-aim-v0.5-single-file
+          path: game/app/src/main/java/com/isanabanana/aim/AIM.kt
           if-no-files-found: error
           retention-days: 14

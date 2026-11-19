@@ -1,13 +1,14 @@
-# AIM Engine baseline
+# AIM single-file version
 
-- Engine repository: https://github.com/isana-banana/aim
-- Target branch: `aim-v0.5`
-- Target commit: `0410ade9404c950d93802c7dd3f7e055280086fd`
+AIM Lab uses the official generated single-file distribution from:
 
-## Snapshot status
+- Repository: https://github.com/isana-banana/aim
+- Branch: `aim-v0.5`
+- Pinned source commit: `0410ade9404c950d93802c7dd3f7e055280086fd`
+- Generator: `tools/build_single_file.py`
+- Generated output: `dist/AIM.kt`
+- App destination during CI: `app/src/main/java/com/isanabanana/aim/AIM.kt`
 
-The vendored `aim-core/` source in this repository came from the older AIM commit `005d8ff6e29a79b883a4000c4e86a26a82300365`. It is **not yet identical to the current aim-v0.5 branch**.
+The build workflow checks out this exact AIM commit, runs the official generator, copies the generated source into the app, and compiles it. This avoids relying on the older vendored `aim-core` module.
 
-Do not treat this game as validated against the current AIM v0.5 API until the vendored module is synchronized with the target commit, the build succeeds, and the game is regression-tested.
-
-The vendored module exists to let GitHub Actions build without cross-repository private checkout permissions. The original AIM repository is the source of truth and must not be modified by game-specific work.
+Do not edit the generated AIM.kt. Game-specific code belongs in the app source files.

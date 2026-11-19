@@ -1,44 +1,33 @@
 # AIM Lab
 
-A collection of small Android 2D game projects used to learn, exercise, and validate **AIM Engine**.
+A small practice project for learning to make Android 2D games with **AIM v0.5**.
 
-## Current project: Stickman Arena
+## How we will use this repository
 
-The first experiment is a landscape 2D action game:
-- Monochrome paper arena with a stickman hero, sword and shield.
-- Left virtual joystick and right-side Dodge / Attack controls.
-- Three enemy types with different health and movement profiles.
-- Enemy pursuit, hit feedback, health, score, defeat and respawn loop.
-- Optional WebSocket room presence and remote-player state relay.
+You tell me what game or feature you want to make. I will guide you with short, beginner-friendly steps. Each lesson changes only the files needed for that goal, then GitHub Actions builds an APK so you can test it on your Android phone.
 
-## Engine baseline
+## Project rules
 
-- Engine repository: https://github.com/isana-banana/aim
-- Target branch: `aim-v0.5`
-- Target commit: `0410ade9404c950d93802c7dd3f7e055280086fd`
-- The currently vendored `aim-core/` directory is an older snapshot. It must be synchronized and regression-tested against the target commit before this project is considered a verified AIM v0.5 game. See [AIM_CORE_VERSION.md](AIM_CORE_VERSION.md).
+- The default branch is `main`; it is the learning workspace.
+- AIM v0.5 is used as the **single generated Kotlin file** `AIM.kt`.
+- The generated file comes from the official AIM repository at the pinned v0.5 commit listed in `AIM_CORE_VERSION.md`.
+- Do not edit the generated `AIM.kt` by hand. Edit the game code in `app/src/main/java/com/isanabanana/aimlab/MainActivity.kt`.
+- No Android Studio or PC is required for this workflow.
 
-The AIM repository is the engine source of truth. Do not develop engine changes in this repository; game-specific experiments belong here.
+## First screen
 
-## Build on Android
+The starter app only shows a simple AIM Lab welcome screen. It is intentionally empty so the first tutorial can start from the basics.
 
-1. Open **Actions** in this repository.
-2. Run the Android build workflow.
-3. Download the APK artifact from a successful run.
-4. Install the APK on an Android phone.
+## Build and download
 
-GitHub Actions is used so development and APK builds can be managed from a phone without Android Studio or a PC.
+1. Open the [Actions page](https://github.com/isana-banana/aim-lab/actions).
+2. Open the latest successful **Build AIM Lab** run on `main`.
+3. Download the `aim-lab-debug-apk` artifact and install the APK on your phone.
+4. The same run also uploads `aim-lab-aim-v0.5-single-file`, containing the generated AIM.kt used for that build.
 
-## Multiplayer experiment
+## Learning workflow
 
-- WebSocket URL: `wss://aim-room-server.bravewarrior011.workers.dev/game?room=training`
-- Room ID: `training`
-
-The room server is currently a relay, not an authoritative combat server. Account identity, secure progression, matchmaking, persistence, anti-cheat, and reconnect reconciliation are not implemented.
-
-## Working rules
-
-- Keep the engine version explicit and reproducible.
-- Keep each game experiment isolated from the AIM engine repository.
-- Make small changes, build, and test before adding the next feature.
-- Do not call a game AIM v0.5-verified until its engine snapshot or dependency matches the pinned commit and the APK has been tested.
+1. Tell me the game you want to make or the next feature.
+2. I explain the goal briefly and make the smallest code change.
+3. GitHub Actions builds the project.
+4. After the build succeeds, install and test it before we continue.
