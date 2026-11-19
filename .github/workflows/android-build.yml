@@ -24,6 +24,7 @@ jobs:
         with:
           repository: isana-banana/aim
           ref: 0410ade9404c950d93802c7dd3f7e055280086fd
+          token: ${{ secrets.AIM_REPO_TOKEN }}
           path: aim-source
 
       - name: Generate official single-file AIM.kt
