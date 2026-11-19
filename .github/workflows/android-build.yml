@@ -19,11 +19,11 @@ jobs:
         with:
           path: game
 
-      - name: Checkout official AIM v0.5 source
+      - name: Checkout AIM adaptive viewport build
         uses: actions/checkout@v4
         with:
           repository: isana-banana/aim
-          ref: 0410ade9404c950d93802c7dd3f7e055280086fd
+          ref: 10796d641ae22d187c6d2e653b0b9db6a3e13885
           token: ${{ secrets.AIM_REPO_TOKEN }}
           path: aim-source
 
